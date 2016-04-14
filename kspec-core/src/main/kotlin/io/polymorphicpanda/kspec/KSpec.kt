@@ -21,9 +21,9 @@ abstract class KSpec: Spec {
 
     open fun configure(config: KSpecConfig) {}
 
-    override fun group(description: String, block: () -> Unit) {
+    override fun group(description: String, tags: Set<Tag>, block: () -> Unit) {
         invokeIfNotDisabled {
-            val context = ExampleGroupContext(description, current)
+            val context = ExampleGroupContext(description, current, tags)
             current = context
             block()
             current = current.parent ?: current
@@ -60,13 +60,14 @@ abstract class KSpec: Spec {
         }
     }
 
-    override fun <T: Any> group(subject: KClass<T>, description: String, block: SubjectSpec<T>.() -> Unit) {
+    override fun <T: Any> group(subject: KClass<T>, description: String, tags: Set<Tag>,
+                                block: SubjectSpec<T>.() -> Unit) {
         invokeIfNotDisabled {
-            val context = ExampleGroupContext(description.format(subject), current) {
+            val context = ExampleGroupContext(description.format(subject), current, tags, {
                 val constructor =
-                        subject.constructors.firstOrNull { it.parameters.isEmpty() } ?: throw IllegalArgumentException()
+                        subject.constructors.firstOrNull { it.parameters.isEmpty() } ?: throw InstantiationException()
                 constructor.call()
-            }
+            })
             current = context
             SubjectKSpec<T>(this, context).apply(block)
             current = current.parent ?: current

@@ -1,12 +1,8 @@
-package io.polymorphicpanda.kspec.filter
+package io.polymorphicpanda.kspec
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.polymorphicpanda.kspec.config.KSpecConfig
-import io.polymorphicpanda.kspec.context
-import io.polymorphicpanda.kspec.describe
-import io.polymorphicpanda.kspec.fit
-import io.polymorphicpanda.kspec.it
 import io.polymorphicpanda.kspec.runner.KSpecRunner
 import io.polymorphicpanda.kspec.runner.RunNotifier
 import io.polymorphicpanda.kspec.support.setupSpec
@@ -15,7 +11,7 @@ import org.junit.Test
 /**
  * @author Ranie Jade Ramiso
  */
-class FocusedExampleTest {
+class FocusedTest {
     @Test
     fun testMatch() {
         val builder = StringBuilder()
@@ -30,9 +26,31 @@ class FocusedExampleTest {
                     builder.appendln("example")
                 }
 
-                context("bar") {
-                    fit("another focused example") {
-                        builder.appendln("another focused example")
+                fcontext("focused group using fcontext") {
+                    it("another focused example #1") {
+                        builder.appendln("another focused example #1")
+                    }
+
+                    fdescribe(String::class, "focused group w/ a subject using fdescribe") {
+                        subject { "hello" }
+
+                        it("another focused example #4") {
+                            builder.appendln("another focused example #4")
+                        }
+                    }
+                }
+
+                fcontext(String::class, "focused group w/ a subject using fcontext") {
+                    subject { "hello" }
+
+                    it("another focused example #2") {
+                        builder.appendln("another focused example #2")
+                    }
+
+                    fdescribe("focused group using fdescribe") {
+                        it("another focused example #3") {
+                            builder.appendln("another focused example #3")
+                        }
                     }
                 }
             }
@@ -46,7 +64,10 @@ class FocusedExampleTest {
 
         val expected = """
         focused example
-        another focused example
+        another focused example #1
+        another focused example #4
+        another focused example #2
+        another focused example #3
         """.trimIndent()
 
         assertThat(builder.trimEnd().toString(), equalTo(expected))

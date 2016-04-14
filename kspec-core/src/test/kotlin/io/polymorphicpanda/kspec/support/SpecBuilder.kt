@@ -2,7 +2,6 @@ package io.polymorphicpanda.kspec.support
 
 import io.polymorphicpanda.kspec.KSpec
 import io.polymorphicpanda.kspec.Spec
-import io.polymorphicpanda.kspec.config.KSpecConfig
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
 
 class TestSpec: KSpec() {

@@ -20,10 +20,10 @@ class AroundHookTest {
         val builder = StringBuilder()
         val config = KSpecConfig()
 
-        config.around { example, chain ->
-            builder.appendln("begin around")
-            chain.next(example)
-            builder.appendln("end around")
+        config.around { context, chain ->
+            builder.appendln("begin around> ${context.description}")
+            chain.next(context)
+            builder.appendln("end around> ${context.description}")
         }
 
         val root = setupSpec {
@@ -52,16 +52,20 @@ class AroundHookTest {
         runner.run(notifier)
 
         val expected = """
-        begin around
+        begin around> ${root.description}
+        begin around> describe: group
+        begin around> it: example
         beforeEach
         example
         afterEach
-        end around
-        begin around
+        end around> it: example
+        begin around> it: another example
         beforeEach
         another example
         afterEach
-        end around
+        end around> it: another example
+        end around> describe: group
+        end around> ${root.description}
         """.trimIndent()
 
         assertThat(builder.trimEnd().toString(), equalTo(expected))

@@ -15,4 +15,5 @@ interface RunListener {
     fun exampleGroupStarted(group: ExampleGroupContext)
     fun exampleGroupFailure(group: ExampleGroupContext, failure: Throwable)
     fun exampleGroupFinished(group: ExampleGroupContext)
+    fun exampleGroupIgnored(group: ExampleGroupContext)
 }

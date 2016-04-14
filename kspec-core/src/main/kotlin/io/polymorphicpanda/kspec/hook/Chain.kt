@@ -1,6 +1,6 @@
 package io.polymorphicpanda.kspec.hook
 
-import io.polymorphicpanda.kspec.context.ExampleContext
+import io.polymorphicpanda.kspec.context.Context
 
 /**
  * @author Ranie Jade Ramiso
@@ -8,8 +8,8 @@ import io.polymorphicpanda.kspec.context.ExampleContext
 abstract class Chain(val list: List<AroundHook>) {
     var iterator = list.iterator()
 
-    fun next(example: ExampleContext) {
-        iterator.next().execute(example, this)
+    fun next(context: Context) {
+        iterator.next().execute(context, this)
     }
 
     abstract fun stop(reason: String)

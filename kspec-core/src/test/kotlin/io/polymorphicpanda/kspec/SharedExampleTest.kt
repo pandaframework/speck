@@ -12,19 +12,13 @@ import org.junit.Test
  */
 class SharedExampleTest {
     @Test
-    fun testSubjectUniqueForEachExample() {
+    fun testShared() {
 
-        var subject1: Throwable? = null
-        var subject2: Throwable? = null
-
+        var subject: Throwable? = null
 
         val shared = sharedExample<Throwable> {
             it("an example") {
-                subject1 = subject
-            }
-
-            it("another example") {
-                subject2 = subject
+                subject = this.subject
             }
         }
 
@@ -39,6 +33,6 @@ class SharedExampleTest {
         val runner = KSpecRunner(spec)
         runner.run(notifier)
 
-        assertThat(subject1 !== subject2, equalTo(true))
+        assertThat(subject is RuntimeException, equalTo(true))
     }
 }
