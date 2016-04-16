@@ -1,6 +1,6 @@
 package io.polymorphicpanda.kspec.config
 
-import io.polymorphicpanda.kspec.context.ExampleContext
+import io.polymorphicpanda.kspec.context.Context
 import io.polymorphicpanda.kspec.hook.AroundHook
 import io.polymorphicpanda.kspec.hook.Chain
 import io.polymorphicpanda.kspec.hook.SimpleHook
@@ -22,15 +22,15 @@ class KSpecConfig {
 
     val filter = FilterConfig()
 
-    fun before(vararg tags: Tag, block: (ExampleContext) -> Unit) {
+    fun before(vararg tags: Tag, block: (Context) -> Unit) {
         _before.add(SimpleHook(block, setOf(*tags)))
     }
 
-    fun after(vararg tags: Tag, block: (ExampleContext) -> Unit) {
+    fun after(vararg tags: Tag, block: (Context) -> Unit) {
         _after.add(SimpleHook(block, setOf(*tags)))
     }
 
-    fun around(vararg tags: Tag, block: (ExampleContext, Chain) -> Unit) {
+    fun around(vararg tags: Tag, block: (Context, Chain) -> Unit) {
         _around.add(AroundHook(block, setOf(*tags)))
     }
 }

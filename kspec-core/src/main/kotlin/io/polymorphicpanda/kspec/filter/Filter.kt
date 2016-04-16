@@ -1,10 +1,7 @@
 package io.polymorphicpanda.kspec.filter
 
 import io.polymorphicpanda.kspec.config.KSpecConfig
-import io.polymorphicpanda.kspec.context.ContextVisitResult
-import io.polymorphicpanda.kspec.context.ContextVisitor
-import io.polymorphicpanda.kspec.context.ExampleContext
-import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.context.*
 import io.polymorphicpanda.kspec.extension.Extension
 import io.polymorphicpanda.kspec.tag.Ignored
 import io.polymorphicpanda.kspec.tag.Tag
@@ -19,9 +16,9 @@ object Filter: Extension {
         val match = config.filter.match
 
         if (match.isNotEmpty() && hasMatch(match, root)) {
-            config.around { example, chain ->
-                if (example.contains(match)) {
-                    chain.next(example)
+            config.around { context, chain ->
+                if (context.contains(match) || (context is ExampleGroupContext && hasMatch(match, context))) {
+                    chain.next(context)
                 } else {
                     chain.stop("Not matching include filter")
                 }
@@ -31,9 +28,9 @@ object Filter: Extension {
         val includes = config.filter.includes
 
         if (includes.isNotEmpty()) {
-            config.around { example, chain ->
-                if (example.contains(includes)) {
-                    chain.next(example)
+            config.around { context, chain ->
+                if (context.contains(includes) || (context is ExampleGroupContext && hasMatch(includes, context))) {
+                    chain.next(context)
                 } else {
                     chain.stop("Not matching include filter")
                 }
@@ -43,11 +40,11 @@ object Filter: Extension {
         val excludes = config.filter.excludes
 
         if (excludes.isNotEmpty()) {
-            config.around { example, chain ->
-                if (!example.contains(excludes)) {
-                    chain.next(example)
+            config.around { context, chain ->
+                if (!context.contains(excludes) || (context is ExampleGroupContext && hasMatch(excludes, context))) {
+                    chain.next(context)
                 } else {
-                    val ignored = example.tags.filterIsInstance(Ignored::class.java).firstOrNull()
+                    val ignored = context.tags.filterIsInstance(Ignored::class.java).firstOrNull()
                     if (ignored != null) {
                         chain.stop(ignored.reason)
                     } else {
@@ -62,13 +59,13 @@ object Filter: Extension {
     fun hasMatch(tags: Set<Tag>, root: ExampleGroupContext): Boolean {
         val check = object: ContextVisitor {
             var match = false
-            override fun preVisitExampleGroup(context: ExampleGroupContext): ContextVisitResult {
-                return ContextVisitResult.CONTINUE
-            }
+            override fun preVisitExampleGroup(context: ExampleGroupContext) = hasMatch(context)
 
             override fun postVisitExampleGroup(context: ExampleGroupContext) = ContextVisitResult.CONTINUE
 
-            override fun onVisitExample(context: ExampleContext): ContextVisitResult {
+            override fun onVisitExample(context: ExampleContext) = hasMatch(context)
+
+            private fun hasMatch(context: Context): ContextVisitResult {
                 match = tags.any {
                     context.contains(it)
                 }
@@ -76,7 +73,6 @@ object Filter: Extension {
                 if (match) {
                     return ContextVisitResult.TERMINATE
                 }
-
                 return ContextVisitResult.CONTINUE
             }
         }

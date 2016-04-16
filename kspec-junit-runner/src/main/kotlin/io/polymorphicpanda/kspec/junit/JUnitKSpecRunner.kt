@@ -36,6 +36,8 @@ class JUnitKSpecRunner<T: KSpec>(clazz: Class<T>): Runner() {
 
             override fun exampleGroupFinished(group: ExampleGroupContext) { }
 
+            override fun exampleGroupIgnored(group: ExampleGroupContext) { }
+
             override fun exampleStarted(example: ExampleContext) {
                 notifier!!.fireTestStarted(describer.contextDescriptions[example])
             }

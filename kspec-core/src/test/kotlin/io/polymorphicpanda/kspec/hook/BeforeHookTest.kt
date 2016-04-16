@@ -21,7 +21,7 @@ class BeforeHookTest {
         val config = KSpecConfig()
 
         config.before {
-            builder.appendln("before hook")
+            builder.appendln("before hook> ${it.description}")
         }
 
         val root = setupSpec {
@@ -47,10 +47,12 @@ class BeforeHookTest {
         runner.run(notifier)
 
         val expected = """
-        before hook
+        before hook> ${root.description}
+        before hook> describe: group
+        before hook> it: example
         beforeEach
         example
-        before hook
+        before hook> it: another example
         beforeEach
         another example""".trimIndent()
 

@@ -21,7 +21,7 @@ class AfterHookTest {
         val config = KSpecConfig()
 
         config.after {
-            builder.appendln("after hook")
+            builder.appendln("after hook> ${it.description}")
         }
 
         val root = setupSpec {
@@ -49,10 +49,12 @@ class AfterHookTest {
         val expected = """
         example
         afterEach
-        after hook
+        after hook> it: example
         another example
         afterEach
-        after hook""".trimIndent()
+        after hook> it: another example
+        after hook> describe: group
+        after hook> ${root.description}""".trimIndent()
 
         assertThat(builder.trimEnd().toString(), equalTo(expected))
     }

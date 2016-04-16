@@ -61,4 +61,10 @@ class RunNotifier {
             it.exampleGroupFinished(group)
         }
     }
+
+    fun notifyExampleGroupIgnored(group: ExampleGroupContext) {
+        listeners.forEach {
+            it.exampleGroupIgnored(group)
+        }
+    }
 }

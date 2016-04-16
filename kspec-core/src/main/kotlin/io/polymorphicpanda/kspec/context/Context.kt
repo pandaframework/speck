@@ -1,14 +1,16 @@
 package io.polymorphicpanda.kspec.context
 
 import io.polymorphicpanda.kspec.tag.Tag
+import io.polymorphicpanda.kspec.tag.Taggable
 import java.util.*
 
-open class Context(val description: String)
+open class Context(val description: String, parent: Taggable?, tags: Set<Tag>): Taggable(parent, tags)
 
 class ExampleGroupContext(description: String,
                           val parent: ExampleGroupContext?,
+                          tags: Set<Tag> = setOf<Tag>(),
                           var subjectFactory: () -> Any? = { throw UnsupportedOperationException() })
-    : Context(description) {
+    : Context(description, parent, tags) {
     internal val children = LinkedList<Context>()
 
     private var subjectInstance: Any? = null
@@ -41,7 +43,6 @@ class ExampleGroupContext(description: String,
         subjectInstance = null
     }
 
-
     companion object {
         private fun doVisit(visitor: ContextVisitor, context: Context): ContextVisitResult {
             when(context) {
@@ -70,9 +71,7 @@ class ExampleGroupContext(description: String,
 
 class ExampleContext(description: String, val parent: ExampleGroupContext,
                      val action: (() -> Unit)?, tags: Set<Tag> = setOf<Tag>())
-    : Context(description) {
-
-    val tags = HashSet<Tag>(tags)
+    : Context(description, parent, tags) {
 
     init {
         parent.children.add(this)
@@ -82,10 +81,4 @@ class ExampleContext(description: String, val parent: ExampleGroupContext,
         parent.reset()
         action!!()
     }
-
-    fun contains(vararg tags: Tag): Boolean = this.tags.any { tags.contains(it) }
-
-    fun contains(tags: Collection<Tag>): Boolean = this.tags.any { tags.contains(it) }
-
-    operator fun get(tag: String): Tag? = tags.firstOrNull { it.name == tag }
 }
