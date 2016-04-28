@@ -88,7 +88,7 @@ class AroundHookTest {
 
         val notifier = RunNotifier()
         val runner = KSpecRunner(root, { config ->
-            config.around(tag) { example, chain ->
+            config.around(false, tag) { example, chain ->
                 builder.appendln("begin around")
 
                 chain.next(example)

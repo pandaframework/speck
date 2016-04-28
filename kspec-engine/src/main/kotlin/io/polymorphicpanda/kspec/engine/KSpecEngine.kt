@@ -9,10 +9,15 @@ import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryResult
+import io.polymorphicpanda.kspec.engine.execution.ContextExecutionChain
 import io.polymorphicpanda.kspec.engine.execution.ExecutionListener
 import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
+import io.polymorphicpanda.kspec.engine.execution.Filter
+import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.filter.Focused
 import io.polymorphicpanda.kspec.hook.AroundHook
 import io.polymorphicpanda.kspec.hook.Chain
+import io.polymorphicpanda.kspec.pending.Pending
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -40,15 +45,117 @@ class KSpecEngine {
 
     fun execute(executionRequest: ExecutionRequest) {
         notifyExecutionStarted()
+        val chain = ContextExecutionChain()
+
+        // match filter
+        chain.add { context, filter, chain ->
+            if (!filter.config.filter.match.isEmpty() && filter.hasAnyMatch()) {
+                if (!filter.matchesMatchFilter(context)) {
+                    notifyContextIgnored(context)
+                    return@add
+                }
+            }
+            chain.next(context, filter)
+        }
+
+        // include filter
+        chain.add { context, filter, chain ->
+            if (filter.config.filter.includes.isEmpty() || filter.matchesIncludeFilter(context)) {
+                chain.next(context, filter)
+            } else {
+                notifyContextIgnored(context)
+            }
+        }
+
+        // exclude filter
+        chain.add { context, filter, chain ->
+            if (filter.config.filter.excludes.isEmpty() || !filter.matchesExcludeFilter(context)) {
+                chain.next(context, filter)
+            } else {
+                notifyContextIgnored(context)
+            }
+        }
+
+        // hooks
+        chain.add { context, filter, chain ->
+            val config = filter.config
+            config.before.filter { it.handles(context) }
+                    .forEach { it.execute(context) }
+
+            config.around(matchAll = true) { context, other ->
+                chain.next(context, filter)
+            }
+
+            val aroundHooks = LinkedList<AroundHook>(
+                    config.around.filter { it.handles(context) }
+            )
+
+            val exec = object: Chain(aroundHooks) {
+                override fun stop(reason: String) {
+                    throw UnsupportedOperationException()
+                }
+            }
+
+            exec.next(context)
+
+            config.after.filter { it.handles(context) }
+                    .forEach { it.execute(context) }
+        }
+
+        // actual
+
+        chain.add { context, filter, chain ->
+            when(context) {
+                is ExampleContext -> {
+                    notifyExampleStarted(context)
+
+                    try {
+                        invokeBeforeEach(context.parent)
+
+                        // ensures that afterEach is still invoke even if the test fails
+                        try {
+                            context()
+                        } catch (e: Throwable) {
+                            notifyExampleFailure(context, e)
+                        }
+
+                        invokeAfterEach(context.parent)
+
+                        notifyExampleFinished(context)
+                    } catch (e: Throwable) {
+                        notifyExampleFailure(context, e)
+                    }
+                }
+                is ExampleGroupContext -> {
+                    try {
+                        context.before?.invoke()
+                        notifyExampleGroupStarted(context)
+
+                        context.children.forEach {
+                            chain.reset()
+                            chain.next(it, filter)
+                        }
+
+                        context.after?.invoke()
+                        notifyExampleGroupFinished(context)
+
+                    } catch(e: Throwable) {
+                        notifyExampleGroupFailure(context, e)
+                    }
+                }
+            }
+        }
+
         executionRequest.discoveryResult.instances.forEach { spec ->
             // apply global configuration
             val config = KSpecConfig()
             config.copy(executionRequest.config)
 
             // apply shared configurations
-            val configurations = Utils.findAnnotation(spec.javaClass.kotlin, Configurations::class)
-            if (configurations != null) {
-                configurations.configurations.forEach {
+            val annotation = Utils.findAnnotation(spec.javaClass.kotlin, Configurations::class)
+            if (annotation != null) {
+                val configurations = annotation.configurations
+                configurations.forEach { it: KClass<out Configuration> ->
                     val configuration = Utils.instantiateUsingNoArgConstructor(it)
                     configuration.apply(config)
                 }
@@ -57,9 +164,13 @@ class KSpecEngine {
             // apply spec configuration
             spec.configure(config)
 
+            // built-in configurations
+            applyBuiltInConfigurations(config)
 
-            // execution phase
-            execute(spec.root, config)
+            val filter = Filter(spec.root, config)
+
+            // start the execution chain
+            chain.next(spec.root, filter)
         }
 
         notifyExecutionFinished()
@@ -77,73 +188,13 @@ class KSpecEngine {
         listeners.clear()
     }
 
+    private fun applyBuiltInConfigurations(config: KSpecConfig) {
+        Pending.apply(config)
+        Focused.apply(config)
+    }
+
     private fun discover(spec: KSpec) {
         spec.spec()
-    }
-
-    private fun execute(context: Context, config: KSpecConfig) {
-        config.before.filter { it.handles(context) }
-            .forEach { it.execute(context) }
-
-        config.around(matchAll = true) { context, chain ->
-            execute(context)
-        }
-
-        val aroundHooks = LinkedList<AroundHook>(
-                config.around.filter { it.handles(context) }
-        )
-
-        val chain = object: Chain(aroundHooks) {
-            override fun stop(reason: String) {
-                throw UnsupportedOperationException()
-            }
-        }
-
-        chain.next(context)
-
-        config.after.filter { it.handles(context) }
-                .forEach { it.execute(context) }
-    }
-
-    private fun execute(context: Context) {
-        when(context) {
-            is ExampleContext -> {
-                notifyExampleStarted(context)
-
-                try {
-                    invokeBeforeEach(context.parent)
-
-                    // ensures that afterEach is still invoke even if the test fails
-                    try {
-                        context()
-                    } catch (e: Throwable) {
-                        notifyExampleFailure(context, e)
-                    }
-
-                    invokeAfterEach(context.parent)
-
-                    notifyExampleFinished(context)
-                } catch (e: Throwable) {
-                    notifyExampleFailure(context, e)
-                }
-            }
-            is ExampleGroupContext -> {
-                try {
-                    context.before?.invoke()
-                    notifyExampleGroupStarted(context)
-
-                    context.children.forEach {
-                        execute(it)
-                    }
-
-                    context.after?.invoke()
-                    notifyExampleGroupFinished(context)
-
-                } catch(e: Throwable) {
-                    notifyExampleGroupFailure(context, e)
-                }
-            }
-        }
     }
 
     private fun notifyExampleGroupStarted(group: ExampleGroupContext) {
@@ -178,9 +229,25 @@ class KSpecEngine {
         listeners.forEach { it.executionFinished() }
     }
 
+    private fun notifyContextIgnored(context: Context) {
+        when(context) {
+            is ExampleGroupContext -> notifyExampleGroupIgnored(context)
+            is ExampleContext -> notifyExampleIgnored(context)
+        }
+    }
+
+    private fun notifyExampleGroupIgnored(group: ExampleGroupContext) {
+        listeners.forEach { it.exampleGroupIgnored(group) }
+    }
+
+    private fun notifyExampleIgnored(example: ExampleContext) {
+        listeners.forEach { it.exampleIgnored(example) }
+    }
+
+
     private fun invokeBeforeEach(context: ExampleGroupContext) {
         if (context.parent != null) {
-            invokeBeforeEach(context.parent as ExampleGroupContext)
+            invokeBeforeEach(context.parent!!)
         }
         context.beforeEach?.invoke()
     }
@@ -188,11 +255,7 @@ class KSpecEngine {
     private fun invokeAfterEach(context: ExampleGroupContext) {
         context.afterEach?.invoke()
         if (context.parent != null) {
-            invokeAfterEach(context.parent as ExampleGroupContext)
+            invokeAfterEach(context.parent!!)
         }
-    }
-
-    fun instantiate(klass: KClass<out KSpec>): KSpec {
-        return Utils.instantiateUsingNoArgConstructor(klass)
     }
 }
