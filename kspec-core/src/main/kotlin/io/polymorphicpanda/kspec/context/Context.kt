@@ -11,7 +11,7 @@ class ExampleGroupContext(description: String,
                           tags: Set<Tag> = setOf<Tag>(),
                           var subjectFactory: () -> Any? = { throw UnsupportedOperationException() })
     : Context(description, parent, tags) {
-    internal val children = LinkedList<Context>()
+    val children = LinkedList<Context>()
 
     private var subjectInstance: Any? = null
 
@@ -77,7 +77,7 @@ class ExampleContext(description: String, val parent: ExampleGroupContext,
         parent.children.add(this)
     }
 
-    internal operator fun invoke() {
+    operator fun invoke() {
         parent.reset()
         action!!()
     }

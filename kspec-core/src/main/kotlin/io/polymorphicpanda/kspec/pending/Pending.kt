@@ -8,7 +8,7 @@ import io.polymorphicpanda.kspec.tag.Tag
 /**
  * @author Ranie Jade Ramiso
  */
-internal object Pending: Configuration {
+object Pending: Configuration {
     const val TAG_NAME = "pending"
 
     fun tag(reason: String = ""): Tag {

@@ -12,13 +12,13 @@ import java.util.*
  */
 class KSpecConfig {
     private val _before = LinkedList<SimpleHook>()
-    internal val before: List<SimpleHook> = _before
+    val before: List<SimpleHook> = _before
 
     private val _after = LinkedList<SimpleHook>()
-    internal val after: List<SimpleHook> = _after
+    val after: List<SimpleHook> = _after
 
     private val _around = LinkedList<AroundHook>()
-    internal val around: List<AroundHook> = _around
+    val around: List<AroundHook> = _around
 
     val filter = FilterConfig()
 
@@ -30,7 +30,14 @@ class KSpecConfig {
         _after.add(SimpleHook(block, setOf(*tags)))
     }
 
-    fun around(vararg tags: Tag, block: (Context, Chain) -> Unit) {
-        _around.add(AroundHook(block, setOf(*tags)))
+    fun around(matchAll: Boolean = false, vararg tags: Tag, block: (Context, Chain) -> Unit) {
+        _around.add(AroundHook(block, setOf(*tags), matchAll))
+    }
+
+    fun copy(source: KSpecConfig) {
+        filter.copy(source.filter)
+        _before.addAll(source.before)
+        _after.addAll(source.after)
+        _around.addAll(source.around)
     }
 }
