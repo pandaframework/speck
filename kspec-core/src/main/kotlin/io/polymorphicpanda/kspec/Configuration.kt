@@ -1,4 +1,4 @@
-package io.polymorphicpanda.kspec.extension
+package io.polymorphicpanda.kspec
 
 import io.polymorphicpanda.kspec.config.KSpecConfig
 

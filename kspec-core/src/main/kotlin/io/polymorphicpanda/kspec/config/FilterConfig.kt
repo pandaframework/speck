@@ -34,4 +34,26 @@ class FilterConfig {
         this._excludes.addAll(source.excludes)
         this._match.addAll(source.match)
     }
+
+    override fun equals(other: Any?): Boolean{
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+
+        other as FilterConfig
+
+        if (includes != other.includes) return false
+        if (excludes != other.excludes) return false
+        if (match != other.match) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int{
+        var result = includes.hashCode()
+        result += 31 * result + excludes.hashCode()
+        result += 31 * result + match.hashCode()
+        return result
+    }
+
+
 }

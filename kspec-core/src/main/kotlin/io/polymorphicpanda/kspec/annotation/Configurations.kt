@@ -1,6 +1,6 @@
 package io.polymorphicpanda.kspec.annotation
 
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import kotlin.reflect.KClass
 
 /**

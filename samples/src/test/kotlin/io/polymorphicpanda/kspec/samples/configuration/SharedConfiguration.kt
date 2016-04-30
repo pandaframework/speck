@@ -1,7 +1,7 @@
 package io.polymorphicpanda.kspec.samples.configuration
 
 import io.polymorphicpanda.kspec.config.KSpecConfig
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.tag.Tag
 
 /**

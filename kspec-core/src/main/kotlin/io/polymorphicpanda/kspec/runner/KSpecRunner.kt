@@ -6,7 +6,7 @@ import io.polymorphicpanda.kspec.config.KSpecConfig
 import io.polymorphicpanda.kspec.context.Context
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.filter.Filter
 import io.polymorphicpanda.kspec.filter.Focused
 import io.polymorphicpanda.kspec.hook.Chain

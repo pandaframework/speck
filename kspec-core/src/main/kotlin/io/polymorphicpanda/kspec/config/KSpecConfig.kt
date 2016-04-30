@@ -40,4 +40,28 @@ class KSpecConfig {
         _after.addAll(source.after)
         _around.addAll(source.around)
     }
+
+    override fun equals(other: Any?): Boolean{
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+
+        other as KSpecConfig
+
+        if (before != other.before) return false
+        if (after != other.after) return false
+        if (around != other.around) return false
+        if (filter != other.filter) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int{
+        var result = before.hashCode()
+        result += 31 * result + after.hashCode()
+        result += 31 * result + around.hashCode()
+        result += 31 * result + filter.hashCode()
+        return result
+    }
+
+
 }

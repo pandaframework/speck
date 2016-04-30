@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.polymorphicpanda.kspec.annotation.Configurations
 import io.polymorphicpanda.kspec.config.KSpecConfig
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.runner.KSpecRunner
 import io.polymorphicpanda.kspec.runner.RunNotifier
 import io.polymorphicpanda.kspec.support.setupSpec

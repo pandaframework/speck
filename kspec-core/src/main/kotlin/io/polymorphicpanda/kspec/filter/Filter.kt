@@ -2,7 +2,7 @@ package io.polymorphicpanda.kspec.filter
 
 import io.polymorphicpanda.kspec.config.KSpecConfig
 import io.polymorphicpanda.kspec.context.*
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.tag.Ignored
 import io.polymorphicpanda.kspec.tag.Tag
 import java.util.*

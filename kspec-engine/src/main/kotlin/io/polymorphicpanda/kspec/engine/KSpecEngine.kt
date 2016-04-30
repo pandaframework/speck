@@ -13,7 +13,7 @@ import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
 import io.polymorphicpanda.kspec.engine.execution.Executor
 import io.polymorphicpanda.kspec.engine.execution.ExecutorChain
-import io.polymorphicpanda.kspec.extension.Configuration
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.filter.Focused
 import io.polymorphicpanda.kspec.pending.Pending
 import java.util.*
