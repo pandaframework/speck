@@ -6,6 +6,7 @@ import io.polymorphicpanda.kspec.context.ExampleGroupContext
 import io.polymorphicpanda.kspec.engine.KSpecEngine
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.execution.ExecutionListener
+import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import org.junit.runner.Description
 import org.junit.runner.Runner
 import org.junit.runner.notification.Failure
@@ -13,7 +14,8 @@ import org.junit.runner.notification.RunNotifier
 
 class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
     val describer = JUnitTestDescriber()
-    val engine = KSpecEngine()
+    val executionNotifier = ExecutionNotifier()
+    val engine = KSpecEngine(executionNotifier)
 
     val discoveryResult by lazy(LazyThreadSafetyMode.NONE) {
         engine.discover(DiscoveryRequest(listOf(clazz.kotlin)))
@@ -26,9 +28,9 @@ class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
     }
 
     override fun run(notifier: RunNotifier?) {
-        engine.clearListeners()
+        executionNotifier.clearListeners()
 
-        engine.addListener(object: ExecutionListener {
+        executionNotifier.addListener(object: ExecutionListener {
             override fun executionStarted() { }
 
             override fun exampleGroupStarted(group: ExampleGroupContext) { }

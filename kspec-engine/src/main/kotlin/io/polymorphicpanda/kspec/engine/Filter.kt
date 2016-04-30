@@ -1,6 +1,6 @@
-package io.polymorphicpanda.kspec.engine.execution
+package io.polymorphicpanda.kspec.engine
 
-import io.polymorphicpanda.kspec.config.KSpecConfig
+import io.polymorphicpanda.kspec.config.FilterConfig
 import io.polymorphicpanda.kspec.context.*
 import io.polymorphicpanda.kspec.tag.Tag
 import java.util.*
@@ -8,20 +8,23 @@ import java.util.*
 /**
  * @author Ranie Jade Ramiso
  */
-class Filter(root: ExampleGroupContext, val config: KSpecConfig) {
+class Filter(root: ExampleGroupContext, val filter: FilterConfig) {
 
     private val includes = HashSet<Context>()
     private val matches = HashSet<Context>()
     private val excludes = HashSet<Context>()
 
     init {
-        config.filter.apply {
+        filter.apply {
             search(includes, match, excludes, root)
         }
     }
 
-    fun hasAnyMatch() = matches.isNotEmpty()
+    fun hasMatchFilter() = filter.match.isNotEmpty()
+    fun hasIncludeFilter() = filter.includes.isNotEmpty()
+    fun hasExcludeFilter() = filter.excludes.isNotEmpty()
 
+    fun hasAnyMatch() = matches.isNotEmpty()
     fun matchesIncludeFilter(context: Context) = includes.contains(context)
     fun matchesMatchFilter(context: Context) = matches.contains(context)
     fun matchesExcludeFilter(context: Context) = excludes.contains(context)
