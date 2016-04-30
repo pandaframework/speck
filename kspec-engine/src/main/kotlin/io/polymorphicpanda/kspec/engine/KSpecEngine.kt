@@ -133,13 +133,6 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
         spec.spec()
     }
 
-    private fun notifyContextIgnored(context: Context) {
-        when(context) {
-            is ExampleGroupContext -> notifier.notifyExampleGroupIgnored(context)
-            is ExampleContext -> notifier.notifyExampleIgnored(context)
-        }
-    }
-
     private fun invokeBeforeEach(context: ExampleGroupContext) {
         if (context.parent != null) {
             invokeBeforeEach(context.parent!!)

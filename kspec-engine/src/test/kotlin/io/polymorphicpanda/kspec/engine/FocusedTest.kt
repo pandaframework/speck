@@ -12,7 +12,7 @@ import org.junit.Test
 /**
  * @author Ranie Jade Ramiso
  */
-class FocusedExampleTest {
+class FocusedTest {
     @Test
     fun testFocusedExample() {
         val builder = StringBuilder()
