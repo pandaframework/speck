@@ -12,9 +12,9 @@ import org.junit.Test
 /**
  * @author Ranie Jade Ramiso
  */
-class FocusedTest {
+class FocusedExampleTest {
     @Test
-    fun testMatch() {
+    fun testFocusedExample() {
         val builder = StringBuilder()
         val notifier = ExecutionNotifier()
 
@@ -29,34 +29,12 @@ class FocusedTest {
         class FocusedSpec: KSpec() {
             override fun spec() {
                 describe("group") {
-                    fit("focused example") {
-                    }
+                    fit("focused example") { }
 
-                    it("example") {
-                    }
+                    it("example") { }
 
-                    fcontext("focused group using fcontext") {
-                        it("another focused example #1") {
-                        }
-
-                        fdescribe(String::class, "focused group w/ a subject using fdescribe") {
-                            subject { "hello" }
-
-                            it("another focused example #4") {
-                            }
-                        }
-                    }
-
-                    fcontext(String::class, "focused group w/ a subject using fcontext") {
-                        subject { "hello" }
-
-                        it("another focused example #2") {
-                        }
-
-                        fdescribe("focused group using fdescribe") {
-                            it("another focused example #3") {
-                            }
-                        }
+                    context("another group") {
+                        fit("another focused example") { }
                     }
                 }
             }
@@ -66,10 +44,48 @@ class FocusedTest {
 
         val expected = """
         it: focused example
-        it: another focused example #1
-        it: another focused example #4
-        it: another focused example #2
-        it: another focused example #3
+        it: another focused example
+        """.trimIndent()
+
+        engine.execute(result)
+
+        assertThat(builder.trimEnd().toString(), equalTo(expected))
+    }
+
+    @Test
+    fun testFocusedExampleGroup() {
+        val builder = StringBuilder()
+        val notifier = ExecutionNotifier()
+
+        notifier.addListener(object: ExecutionListenerAdapter() {
+            override fun exampleStarted(example: ExampleContext) {
+                builder.appendln(example.description)
+            }
+        })
+
+        val engine = KSpecEngine(notifier)
+
+        class FocusedSpec: KSpec() {
+            override fun spec() {
+                describe("group") {
+                    it("example") { }
+
+                    fcontext("another group") {
+                        it("focused example") { }
+                    }
+
+                    fdescribe("other group") {
+                        it("another focused example") { }
+                    }
+                }
+            }
+        }
+
+        val result = engine.discover(DiscoveryRequest(listOf(FocusedSpec::class)))
+
+        val expected = """
+        it: focused example
+        it: another focused example
         """.trimIndent()
 
         engine.execute(result)
