@@ -125,6 +125,7 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
 
     private fun discover(spec: KSpec) {
         spec.spec()
+        spec.lock()
     }
 
     private fun invokeBeforeEach(context: ExampleGroupContext) {

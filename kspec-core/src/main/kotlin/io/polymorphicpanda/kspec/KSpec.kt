@@ -11,10 +11,10 @@ abstract class KSpec: Spec {
 
     var current = root
 
-    var disabled = false
+    var locked = false
 
-    fun disable() {
-        disabled = true
+    fun lock() {
+        locked = true
     }
 
     abstract fun spec();
@@ -22,7 +22,7 @@ abstract class KSpec: Spec {
     open fun configure(config: KSpecConfig) {}
 
     override fun group(description: String, tags: Set<Tag>, block: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             val context = ExampleGroupContext(description, current, tags)
             current = context
             block()
@@ -31,38 +31,38 @@ abstract class KSpec: Spec {
     }
 
     override fun example(description: String, tags: Set<Tag>, block: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             ExampleContext(description, current, block, tags)
         }
     }
 
     override fun before(action: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             current.before = action
         }
     }
 
     override fun after(action: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             current.after = action
         }
     }
 
     override fun beforeEach(action: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             current.beforeEach = action
         }
     }
 
     override fun afterEach(action: () -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             current.afterEach = action
         }
     }
 
     override fun <T: Any> group(subject: KClass<T>, description: String, tags: Set<Tag>,
                                 block: SubjectSpec<T>.() -> Unit) {
-        invokeIfNotDisabled {
+        invokeIfNotLocked {
             val context = ExampleGroupContext(description.format(subject), current, tags, {
                 val constructor =
                         subject.constructors.firstOrNull { it.parameters.isEmpty() } ?: throw InstantiationException()
@@ -74,9 +74,9 @@ abstract class KSpec: Spec {
         }
     }
 
-    internal fun invokeIfNotDisabled(block: () -> Unit) {
-        if (disabled) {
-            throw CollectionException("You bad bad boy, this is not allowed here.")
+    internal fun invokeIfNotLocked(block: () -> Unit) {
+        if (locked) {
+            throw InvalidSpecException("You bad bad boy, this is not allowed here.")
         }
         block()
     }
@@ -85,13 +85,13 @@ abstract class KSpec: Spec {
 class SubjectKSpec<T: Any>(val kspec: KSpec,
                            val context: ExampleGroupContext): SubjectSpec<T>, Spec by kspec {
     override fun subject(block: () -> T) {
-        kspec.invokeIfNotDisabled {
+        kspec.invokeIfNotLocked {
             context.subjectFactory = block
         }
     }
 
     override fun include(sharedExample: SharedExample<in T>) {
-        kspec.invokeIfNotDisabled {
+        kspec.invokeIfNotLocked {
             sharedExample.example().invoke(this)
         }
     }

@@ -2,10 +2,9 @@ package io.polymorphicpanda.kspec.junit
 
 import io.polymorphicpanda.kspec.KSpec
 import io.polymorphicpanda.kspec.context.ExampleContext
-import io.polymorphicpanda.kspec.context.ExampleGroupContext
 import io.polymorphicpanda.kspec.engine.KSpecEngine
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
-import io.polymorphicpanda.kspec.engine.execution.ExecutionListener
+import io.polymorphicpanda.kspec.engine.execution.ExecutionListenerAdapter
 import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import org.junit.runner.Description
 import org.junit.runner.Runner
@@ -30,17 +29,7 @@ class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
     override fun run(notifier: RunNotifier) {
         executionNotifier.clearListeners()
 
-        executionNotifier.addListener(object: ExecutionListener {
-            override fun executionStarted() { }
-
-            override fun exampleGroupStarted(group: ExampleGroupContext) { }
-
-            override fun exampleGroupFailure(group: ExampleGroupContext, throwable: Throwable) { }
-
-            override fun exampleGroupFinished(group: ExampleGroupContext) { }
-
-            override fun exampleGroupIgnored(group: ExampleGroupContext) { }
-
+        executionNotifier.addListener(object: ExecutionListenerAdapter() {
             override fun exampleStarted(example: ExampleContext) {
                 notifier.fireTestStarted(describer.contextDescriptions[example])
             }
@@ -56,8 +45,6 @@ class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
             override fun exampleIgnored(example: ExampleContext) {
                 notifier.fireTestIgnored(describer.contextDescriptions[example])
             }
-
-            override fun executionFinished() { }
         })
 
         engine.execute(discoveryResult)
