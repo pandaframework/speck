@@ -26,9 +26,6 @@ class HookExecutor(val config: KSpecConfig, val notifier: ExecutionNotifier): Ex
         )
 
         val exec = object: Chain(aroundHooks) {
-            override fun stop(reason: String) {
-                throw UnsupportedOperationException()
-            }
         }
 
         exec.next(context)

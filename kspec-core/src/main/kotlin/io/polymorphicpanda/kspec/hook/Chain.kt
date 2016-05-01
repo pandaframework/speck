@@ -11,6 +11,4 @@ abstract class Chain(val list: List<AroundHook>) {
     fun next(context: Context) {
         iterator.next().execute(context, this)
     }
-
-    abstract fun stop(reason: String)
 }
