@@ -27,7 +27,7 @@ class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
         describer.contextDescriptions[spec.root]!!
     }
 
-    override fun run(notifier: RunNotifier?) {
+    override fun run(notifier: RunNotifier) {
         executionNotifier.clearListeners()
 
         executionNotifier.addListener(object: ExecutionListener {
@@ -42,19 +42,19 @@ class JUnitKSpecRunner<T: KSpec>(val clazz: Class<T>): Runner() {
             override fun exampleGroupIgnored(group: ExampleGroupContext) { }
 
             override fun exampleStarted(example: ExampleContext) {
-                notifier!!.fireTestStarted(describer.contextDescriptions[example])
+                notifier.fireTestStarted(describer.contextDescriptions[example])
             }
 
             override fun exampleFailure(example: ExampleContext, throwable: Throwable) {
-                notifier!!.fireTestFailure(Failure(describer.contextDescriptions[example], throwable))
+                notifier.fireTestFailure(Failure(describer.contextDescriptions[example], throwable))
             }
 
             override fun exampleFinished(example: ExampleContext) {
-                notifier!!.fireTestFinished(describer.contextDescriptions[example])
+                notifier.fireTestFinished(describer.contextDescriptions[example])
             }
 
             override fun exampleIgnored(example: ExampleContext) {
-                notifier!!.fireTestIgnored(describer.contextDescriptions[example])
+                notifier.fireTestIgnored(describer.contextDescriptions[example])
             }
 
             override fun executionFinished() { }
