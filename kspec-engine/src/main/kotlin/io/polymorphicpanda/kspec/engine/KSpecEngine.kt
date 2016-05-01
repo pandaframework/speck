@@ -1,6 +1,8 @@
 package io.polymorphicpanda.kspec.engine
 
+import io.polymorphicpanda.kspec.Configuration
 import io.polymorphicpanda.kspec.KSpec
+import io.polymorphicpanda.kspec.StandardConfiguration
 import io.polymorphicpanda.kspec.Utils
 import io.polymorphicpanda.kspec.annotation.Configurations
 import io.polymorphicpanda.kspec.config.KSpecConfig
@@ -13,9 +15,6 @@ import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
 import io.polymorphicpanda.kspec.engine.execution.Executor
 import io.polymorphicpanda.kspec.engine.execution.ExecutorChain
-import io.polymorphicpanda.kspec.Configuration
-import io.polymorphicpanda.kspec.filter.Focused
-import io.polymorphicpanda.kspec.pending.Pending
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -60,7 +59,7 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
             spec.configure(config)
 
             // built-in configurations
-            applyBuiltInConfigurations(config)
+            StandardConfiguration.apply(config)
 
             val filter = Filter(spec.root, config.filter)
             val chain = ExecutorChain().apply {
@@ -122,11 +121,6 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
             }
         }
 
-    }
-
-    private fun applyBuiltInConfigurations(config: KSpecConfig) {
-        Pending.apply(config)
-        Focused.apply(config)
     }
 
     private fun discover(spec: KSpec) {

@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import io.polymorphicpanda.kspec.context
 import io.polymorphicpanda.kspec.describe
 import io.polymorphicpanda.kspec.it
-import io.polymorphicpanda.kspec.support.setupSpec
+import io.polymorphicpanda.kspec.setupSpec
 import org.junit.Test
 
 /**

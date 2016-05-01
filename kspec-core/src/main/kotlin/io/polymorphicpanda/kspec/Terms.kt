@@ -1,8 +1,8 @@
 package io.polymorphicpanda.kspec
 
 import io.polymorphicpanda.kspec.tag.Tag
-import io.polymorphicpanda.kspec.tag.focus
-import io.polymorphicpanda.kspec.tag.pending
+import io.polymorphicpanda.kspec.focus
+import io.polymorphicpanda.kspec.pending
 import kotlin.reflect.KClass
 
 fun Spec.describe(description: String, vararg tags: Tag, action: () -> Unit) {

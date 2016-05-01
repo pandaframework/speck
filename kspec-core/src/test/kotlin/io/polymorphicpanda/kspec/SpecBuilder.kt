@@ -1,4 +1,4 @@
-package io.polymorphicpanda.kspec.support
+package io.polymorphicpanda.kspec
 
 import io.polymorphicpanda.kspec.KSpec
 import io.polymorphicpanda.kspec.Spec
