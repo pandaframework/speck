@@ -17,7 +17,7 @@ class HookExecutor(val config: KSpecConfig, val notifier: ExecutionNotifier): Ex
         config.before.filter { it.handles(context) }
                 .forEach { it.execute(context) }
 
-        config.around(matchAll = true) { context, other ->
+        config.around { context, other ->
             chain.next(context)
         }
 

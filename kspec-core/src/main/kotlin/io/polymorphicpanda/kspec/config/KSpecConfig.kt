@@ -30,8 +30,8 @@ class KSpecConfig {
         _after.add(SimpleHook(block, setOf(*tags)))
     }
 
-    fun around(matchAll: Boolean = false, vararg tags: Tag, block: (Context, Chain) -> Unit) {
-        _around.add(AroundHook(block, setOf(*tags), matchAll))
+    fun around(vararg tags: Tag, block: (Context, Chain) -> Unit) {
+        _around.add(AroundHook(block, setOf(*tags)))
     }
 
     fun copy(source: KSpecConfig) {

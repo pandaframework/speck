@@ -6,8 +6,8 @@ import io.polymorphicpanda.kspec.tag.Tag
 /**
  * @author Ranie Jade Ramiso
  */
-abstract class Hook(val tags: Set<Tag>, val matchAll: Boolean = false) {
+abstract class Hook(val tags: Set<Tag>) {
     open fun handles(context: Context): Boolean {
-        return matchAll || context.tags.containsAll(tags)
+        return tags.isEmpty() || context.tags.containsAll(tags)
     }
 }
