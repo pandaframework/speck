@@ -17,7 +17,7 @@ class MemoizedHelper<T>(val factory: () -> T) {
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = get()
 
-    fun reset() {
+    fun forget() {
         instance = null
     }
 }

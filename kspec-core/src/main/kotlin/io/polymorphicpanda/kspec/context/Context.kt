@@ -39,7 +39,7 @@ class ExampleGroupContext(description: String,
 
     internal fun reset() {
         parent?.reset()
-        memoizedSubject.reset()
+        memoizedSubject.forget()
     }
 
     companion object {
