@@ -44,7 +44,7 @@ jacoco {
 }
 
 
-task generateCoverageReport(type: JacocoReport) {
+task jacocoTestReport(type: JacocoReport) {
     sourceDirectories = files()
     classDirectories = files()
     subprojects {
@@ -64,5 +64,5 @@ task generateCoverageReport(type: JacocoReport) {
 }
 
 task check() {
-    dependsOn generateCoverageReport
+    dependsOn jacocoTestReport
 }
