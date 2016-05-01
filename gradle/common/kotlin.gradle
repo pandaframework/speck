@@ -20,11 +20,6 @@ jacoco {
     toolVersion = "0.7.6.201602180812"
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
 
 test {
     reports {
@@ -35,9 +30,4 @@ test {
 
 dokka {
     outputFormat = "markdown"
-}
-
-
-check {
-    dependsOn jacocoTestReport
 }
