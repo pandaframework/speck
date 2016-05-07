@@ -90,13 +90,13 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
                         // ensures that afterEach is still invoke even if the test fails
                         try {
                             context()
+                            notifier.notifyExampleFinished(context)
                         } catch (e: Throwable) {
                             notifier.notifyExampleFailure(context, e)
                         }
 
                         invokeAfterEach(context.parent)
 
-                        notifier.notifyExampleFinished(context)
                     } catch (e: Throwable) {
                         notifier.notifyExampleFailure(context, e)
                     }
