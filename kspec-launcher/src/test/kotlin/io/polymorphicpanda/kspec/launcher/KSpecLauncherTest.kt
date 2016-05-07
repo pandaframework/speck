@@ -132,4 +132,51 @@ class KSpecLauncherTest {
         assertThat(reporter.exampleSuccessCount, equalTo(0))
         assertThat(reporter.exampleGroupSuccessCount, equalTo(2))
     }
+
+    @Test
+    fun testLaunchWithIgnored() {
+        val launcher = KSpecLauncher()
+        val builder = StringBuilder()
+
+        val reporter: BaseReporter = object: BaseReporter() {
+            override fun exampleGroupSuccess(group: ExampleGroupContext) {
+                super.exampleGroupSuccess(group)
+                builder.appendln(group.description)
+            }
+
+            override fun exampleIgnored(example: ExampleContext) {
+                super.exampleIgnored(example)
+                builder.appendln(example.description)
+            }
+
+            override fun exampleGroupIgnored(group: ExampleGroupContext) {
+                super.exampleGroupIgnored(group)
+                builder.appendln(group.description)
+            }
+        }
+
+        launcher.addReporter(reporter)
+
+        val configuration = LaunchConfiguration(
+            Paths.get(this.javaClass.classLoader.getResource("specs").toURI()),
+            emptyList(),
+            "io.polymorphicpanda.kspec.sample.IgnoredSpec"
+        )
+
+        launcher.launch(configuration)
+
+        val expected = """
+        context: pending group
+        it: pending example
+        describe: a group
+        io.polymorphicpanda.kspec.sample.IgnoredSpec
+        """.trimIndent()
+
+        assertThat(builder.trimEnd().toString(), equalTo(expected))
+        assertThat(reporter.totalFailureCount, equalTo(0))
+        assertThat(reporter.exampleIgnoredCount, equalTo(1))
+        assertThat(reporter.exampleGroupIgnoredCount, equalTo(1))
+        assertThat(reporter.exampleGroupSuccessCount, equalTo(2))
+        assertThat(reporter.exampleSuccessCount, equalTo(0))
+    }
 }

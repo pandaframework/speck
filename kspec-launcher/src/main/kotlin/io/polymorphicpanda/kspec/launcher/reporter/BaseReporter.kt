@@ -46,30 +46,37 @@ open class BaseReporter: ReporterAdapter() {
 
 
     override fun exampleGroupSuccess(group: ExampleGroupContext) {
+        super.exampleGroupSuccess(group)
         exampleGroupSuccessCounter.andIncrement
     }
 
     override fun exampleSuccess(example: ExampleContext) {
+        super.exampleSuccess(example)
         exampleSuccessCounter.andIncrement
     }
 
     override fun exampleGroupFailure(group: ExampleGroupContext, reason: Throwable) {
+        super.exampleGroupFailure(group, reason)
         exampleGroupFailureCounter.andIncrement
     }
 
     override fun exampleFailure(example: ExampleContext, reason: Throwable) {
+        super.exampleFailure(example, reason)
         exampleFailureCounter.andIncrement
     }
 
     override fun exampleGroupIgnored(group: ExampleGroupContext) {
+        super.exampleGroupIgnored(group)
         exampleGroupIgnoredCounter.andIncrement
     }
 
     override fun exampleIgnored(example: ExampleContext) {
+        super.exampleIgnored(example)
         exampleIgnoredCounter.andIncrement
     }
 
     override fun executionStarted() {
+        super.executionStarted()
         exampleGroupSuccessCounter.set(0)
         exampleSuccessCounter.set(0)
         exampleGroupFailureCounter.set(0)
