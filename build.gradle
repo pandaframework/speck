@@ -36,7 +36,7 @@ if (hasProperty("bintray_api_key")) {
 
 allprojects {
     group = "io.polymorphicpanda.kspec"
-    version = "0.3.0"
+    version = "0.4.0-SNAPSHOT"
 }
 
 jacoco {
