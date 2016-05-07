@@ -6,5 +6,6 @@ package io.polymorphicpanda.kspec.context
 enum class ContextVisitResult {
     CONTINUE,
     SKIP_SUBTREE,
+    REMOVE,
     TERMINATE
 }

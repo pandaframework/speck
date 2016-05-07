@@ -1,12 +1,15 @@
 package io.polymorphicpanda.kspec.launcher
 
 import io.polymorphicpanda.kspec.KSpec
+import io.polymorphicpanda.kspec.config.KSpecConfig
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
 import io.polymorphicpanda.kspec.engine.KSpecEngine
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.execution.ExecutionListenerAdapter
 import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
+import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
+import io.polymorphicpanda.kspec.engine.query.Query
 import io.polymorphicpanda.kspec.launcher.reporter.Reporter
 import java.net.URL
 import java.net.URLClassLoader
@@ -93,13 +96,19 @@ class KSpecLauncher {
             .sortedBy { it.name }
             .map { it.kotlin as KClass<out KSpec> }
 
-        runSpecs(filtered)
+        runSpecs(filtered, configuration.query)
     }
 
-    private fun runSpecs(specs: List<KClass<out KSpec>>) {
-        val discoveryResult = engine.discover(DiscoveryRequest(specs))
+    private fun runSpecs(specs: List<KClass<out KSpec>>, query: String) {
+        var discoveryResult = engine.discover(DiscoveryRequest(specs))
 
-        engine.execute(discoveryResult)
+        engine.execute(
+            ExecutionRequest(
+                KSpecConfig(),
+                discoveryResult,
+                if (query.isNotBlank()) Query.parse(query) else null
+            )
+        )
     }
 
     private fun escape(pattern: String): String {

@@ -6,15 +6,14 @@ import io.polymorphicpanda.kspec.StandardConfiguration
 import io.polymorphicpanda.kspec.Utils
 import io.polymorphicpanda.kspec.annotation.Configurations
 import io.polymorphicpanda.kspec.config.KSpecConfig
-import io.polymorphicpanda.kspec.context.Context
-import io.polymorphicpanda.kspec.context.ExampleContext
-import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.context.*
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryResult
 import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
 import io.polymorphicpanda.kspec.engine.execution.Executor
 import io.polymorphicpanda.kspec.engine.execution.ExecutorChain
+import io.polymorphicpanda.kspec.engine.query.Query
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -61,7 +60,13 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
             // built-in configurations
             StandardConfiguration.apply(config)
 
-            val filter = Filter(spec.root, config.filter)
+            var root = spec.root
+
+            if (executionRequest.query != null) {
+                root = filter(root, executionRequest.query)
+            }
+
+            val filter = Filter(root, config.filter)
             val chain = ExecutorChain().apply {
                 + MatchExecutor(filter, notifier)
                 + IncludeExecutor(filter, notifier)
@@ -72,7 +77,7 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
 
 
             // start the execution chain
-            chain.next(spec.root)
+            chain.next(root)
         }
 
         notifier.notifyExecutionFinished()
@@ -121,6 +126,46 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
             }
         }
 
+    }
+
+    private fun filter(root: ExampleGroupContext, query: Query): ExampleGroupContext {
+        root.visit(object: ContextVisitor {
+            val matched = HashSet<Context>()
+
+            override fun preVisitExampleGroup(context: ExampleGroupContext): ContextVisitResult {
+                return ContextVisitResult.CONTINUE
+            }
+
+            override fun onVisitExample(context: ExampleContext): ContextVisitResult {
+                if (query.matches(Query.transform(context))) {
+                    addRecursive(context)
+                }
+                return ContextVisitResult.CONTINUE
+            }
+
+            override fun postVisitExampleGroup(context: ExampleGroupContext): ContextVisitResult {
+                if (matched.contains(context) || query.matches(Query.transform(context))) {
+                    return ContextVisitResult.CONTINUE
+                }
+                return ContextVisitResult.REMOVE
+            }
+
+            private fun addRecursive(context: Context) {
+                matched.add(context)
+                when(context) {
+                    is ExampleContext -> {
+                        addRecursive(context.parent)
+                    }
+                    is ExampleGroupContext -> {
+                        if (context.parent != null) {
+                            addRecursive(context.parent!!)
+                        }
+                    }
+                }
+            }
+        })
+
+        return root
     }
 
     private fun discover(spec: KSpec) {

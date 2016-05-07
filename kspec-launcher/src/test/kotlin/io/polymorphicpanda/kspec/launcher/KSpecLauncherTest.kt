@@ -53,6 +53,48 @@ class KSpecLauncherTest {
     }
 
     @Test
+    fun testLaunchWithQuery() {
+        val launcher = KSpecLauncher()
+        val builder = StringBuilder()
+
+        val reporter: BaseReporter = object: BaseReporter() {
+            override fun exampleGroupSuccess(group: ExampleGroupContext) {
+                super.exampleGroupSuccess(group)
+                builder.appendln(group.description)
+            }
+
+            override fun exampleSuccess(example: ExampleContext) {
+                super.exampleSuccess(example)
+                builder.appendln(example.description)
+            }
+        }
+
+        launcher.addReporter(reporter)
+
+        val configuration = LaunchConfiguration(
+            Paths.get(this.javaClass.classLoader.getResource("specs").toURI()),
+            emptyList(),
+            "io.polymorphicpanda.kspec.sample.AnotherSpec",
+            "context: a nested group/it: example"
+        )
+
+        launcher.launch(configuration)
+
+        val expected = """
+        it: example
+        context: a nested group
+        describe: a group
+        io.polymorphicpanda.kspec.sample.AnotherSpec
+        """.trimIndent()
+
+        assertThat(builder.trimEnd().toString(), equalTo(expected))
+        assertThat(reporter.totalFailureCount, equalTo(0))
+        assertThat(reporter.exampleSuccessCount, equalTo(1))
+        assertThat(reporter.exampleGroupSuccessCount, equalTo(3))
+        assertThat(reporter.totalIgnoredCount, equalTo(0))
+    }
+
+    @Test
     fun testLaunchMatchingPacking() {
         val launcher = KSpecLauncher()
         val builder = StringBuilder()

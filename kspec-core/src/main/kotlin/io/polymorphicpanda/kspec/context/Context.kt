@@ -49,9 +49,13 @@ class ExampleGroupContext(description: String,
                     val result = visitor.preVisitExampleGroup(context)
 
                     if(result == ContextVisitResult.CONTINUE) {
-                        context.children.forEach {
-                            if (doVisit(visitor, it) == ContextVisitResult.TERMINATE) {
-                                 return ContextVisitResult.TERMINATE
+                        val iterator = context.children.iterator()
+                        while (iterator.hasNext()) {
+                            val visitResult = doVisit(visitor, iterator.next())
+                            if (visitResult == ContextVisitResult.TERMINATE) {
+                                return ContextVisitResult.TERMINATE
+                            } else if (visitResult == ContextVisitResult.REMOVE) {
+                                iterator.remove()
                             }
                         }
                     }
