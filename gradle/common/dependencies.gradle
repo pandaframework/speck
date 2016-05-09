@@ -6,6 +6,8 @@ dependencyManagement {
         dependency "com.google.guava:guava:19.0"
         dependency "junit:junit:4.12"
 
+        dependency "net.sf.jopt-simple:jopt-simple:5.0.1"
+
         dependencySet(group: 'org.jetbrains.kotlin', version: '1.0.1') {
             entry 'kotlin-stdlib'
             entry 'kotlin-reflect'

@@ -15,6 +15,7 @@ sourceSets {
 
 dependencies {
     compile project(":kspec-engine")
+    compile 'net.sf.jopt-simple:jopt-simple'
     testCompile "junit:junit"
     testCompile "com.natpryce:hamkrest"
 
