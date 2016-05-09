@@ -12,6 +12,7 @@ import java.nio.file.Paths
  * @author Ranie Jade Ramiso
  */
 class KSpecLauncherTest {
+
     @Test
     fun testLaunchMatchingSingleClass() {
         val launcher = KSpecLauncher()

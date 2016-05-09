@@ -75,7 +75,7 @@ class KSpecLauncher {
         val target = configuration.specs
 
         if (!target.isDirectory()) {
-            throw IllegalArgumentException("Target must be a directory.")
+            throw IllegalArgumentException("Invalid target.")
         }
 
         val classes = searchClasses(target)
@@ -88,11 +88,17 @@ class KSpecLauncher {
 
         Thread.currentThread().contextClassLoader = classloader
 
-        val pattern = Pattern.compile(escape(configuration.spec))
+        val pattern = Pattern.compile(escape(configuration.filter))
 
         val filtered = classes.map { classloader.loadClass(it) }
             .filter { KSpec::class.java.isAssignableFrom(it)}
-            .filter { pattern.matcher(it.name).matches() }
+            .filter {
+                if (configuration.filter.isEmpty()) {
+                    true
+                } else {
+                    pattern.matcher(it.name).matches()
+                }
+            }
             .sortedBy { it.name }
             .map { it.kotlin as KClass<out KSpec> }
 

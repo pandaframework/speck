@@ -1,7 +1,8 @@
-package io.polymorphicpanda.kspec.launcher.reporter
+package io.polymorphicpanda.kspec.console.reporter
 
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.launcher.reporter.BaseReporter
 import java.io.PrintStream
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -44,9 +45,14 @@ class ConsoleReporter(val out: PrintStream = System.out,
         updateStatusLine()
     }
 
+    override fun executionFinished() {
+        super.executionFinished()
+        out.println()
+    }
+
     private fun updateStatusLine() {
-        val status
-            = "\u001B[1m> Executed ${counter.toInt()} spec(s), ${totalFailureCount.toInt()} failed, ${totalIgnoredCount.toInt()} ignored."
+        val status = "\u001B[1m> ${counter.toInt()} spec(s) completed, " +
+            "${totalFailureCount.toInt()} failed, ${totalIgnoredCount.toInt()} ignored."
         out.print("\r$status")
     }
 }

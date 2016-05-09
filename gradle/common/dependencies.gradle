@@ -8,10 +8,11 @@ dependencyManagement {
 
         dependency "net.sf.jopt-simple:jopt-simple:5.0.1"
 
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.0.1') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.0.1-2') {
             entry 'kotlin-stdlib'
             entry 'kotlin-reflect'
             entry 'kotlin-test'
+            entry 'kotlin-compiler'
         }
     }
 }

@@ -1,6 +1,7 @@
 include 'kspec-core'
 include 'kspec-engine'
 include 'kspec-launcher'
+include 'kspec-console-runner'
 include 'kspec-junit-runner'
 include 'dist'
 include 'samples'

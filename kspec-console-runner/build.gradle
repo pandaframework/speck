@@ -1,18 +1,27 @@
 apply from: "$rootDir/gradle/common/dependencies.gradle"
 apply from: "$rootDir/gradle/common/kotlin.gradle"
 
+apply plugin: "application"
+
 dokka {
     outputFormat = 'html'
 }
 
+mainClassName = "io.polymorphicpanda.kspec.console.MainKt"
 
 sourceSets {
     spec {
     }
 }
 
+startScripts {
+    applicationName = "kspec"
+}
+
 dependencies {
-    compile project(":kspec-engine")
+    compile project(":kspec-launcher")
+    compile 'net.sf.jopt-simple:jopt-simple'
+    compile "org.jetbrains.kotlin:kotlin-compiler"
     testCompile "junit:junit"
     testCompile "com.natpryce:hamkrest"
 
@@ -26,7 +35,9 @@ task sourceJar(type: Jar) {
 
 
 processTestResources {
-    from(compileSpecKotlin) {
-        into 'specs'
+    afterEvaluate {
+        from(sourceSets.spec.allSource) {
+            into "specs_raw"
+        }
     }
 }

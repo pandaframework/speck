@@ -8,6 +8,6 @@ import java.nio.file.Path
 data class LaunchConfiguration(
     val specs: Path,
     val classpath: List<Path>,
-    val spec: String = "",
+    val filter: String = "",
     val query: String = ""
 )
