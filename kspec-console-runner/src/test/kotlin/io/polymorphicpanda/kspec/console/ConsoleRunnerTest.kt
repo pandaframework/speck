@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.engine.execution.ExecutionResult
 import io.polymorphicpanda.kspec.launcher.KSpecLauncher
 import io.polymorphicpanda.kspec.launcher.reporter.BaseReporter
 import org.junit.Test
@@ -56,13 +57,13 @@ class ConsoleRunnerTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 
-            override fun exampleSuccess(example: ExampleContext) {
-                super.exampleSuccess(example)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                super.exampleFinished(example, result)
                 builder.appendln(example.description)
             }
         }

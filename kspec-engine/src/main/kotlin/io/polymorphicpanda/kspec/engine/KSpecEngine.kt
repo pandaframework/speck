@@ -9,10 +9,7 @@ import io.polymorphicpanda.kspec.config.KSpecConfig
 import io.polymorphicpanda.kspec.context.*
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryResult
-import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
-import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
-import io.polymorphicpanda.kspec.engine.execution.Executor
-import io.polymorphicpanda.kspec.engine.execution.ExecutorChain
+import io.polymorphicpanda.kspec.engine.execution.*
 import io.polymorphicpanda.kspec.engine.query.Query
 import java.util.*
 import kotlin.reflect.KClass
@@ -95,15 +92,15 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
                         // ensures that afterEach is still invoke even if the test fails
                         try {
                             context()
-                            notifier.notifyExampleFinished(context)
+                            notifier.notifyExampleFinished(context, ExecutionResult.success(context))
                         } catch (e: Throwable) {
-                            notifier.notifyExampleFailure(context, e)
+                            notifier.notifyExampleFinished(context, ExecutionResult.failure(context, e))
                         }
 
                         invokeAfterEach(context.parent)
 
                     } catch (e: Throwable) {
-                        notifier.notifyExampleFailure(context, e)
+                        notifier.notifyExampleFinished(context, ExecutionResult.failure(context, e))
                     }
                 }
                 is ExampleGroupContext -> {
@@ -117,10 +114,10 @@ class KSpecEngine(val notifier: ExecutionNotifier) {
                         }
 
                         context.after?.invoke()
-                        notifier.notifyExampleGroupFinished(context)
+                        notifier.notifyExampleGroupFinished(context, ExecutionResult.success(context))
 
                     } catch(e: Throwable) {
-                        notifier.notifyExampleGroupFailure(context, e)
+                        notifier.notifyExampleGroupFinished(context, ExecutionResult.failure(context, e))
                     }
                 }
             }

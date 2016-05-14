@@ -9,6 +9,7 @@ import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.execution.ExecutionListenerAdapter
 import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
 import io.polymorphicpanda.kspec.engine.execution.ExecutionRequest
+import io.polymorphicpanda.kspec.engine.execution.ExecutionResult
 import io.polymorphicpanda.kspec.engine.query.Query
 import io.polymorphicpanda.kspec.launcher.reporter.Reporter
 import java.net.URL
@@ -32,28 +33,20 @@ class KSpecLauncher {
             reporters.forEach { it.executionFinished() }
         }
 
-        override fun exampleFailure(example: ExampleContext, throwable: Throwable) {
-            reporters.forEach { it.exampleFailure(example, throwable) }
-        }
-
-        override fun exampleFinished(example: ExampleContext) {
-            reporters.forEach { it.exampleSuccess(example) }
+        override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+            reporters.forEach { it.exampleFinished(example, result) }
         }
 
         override fun exampleIgnored(example: ExampleContext) {
             reporters.forEach { it.exampleIgnored(example) }
         }
 
-        override fun exampleGroupFailure(group: ExampleGroupContext, throwable: Throwable) {
-            reporters.forEach { it.exampleGroupFailure(group, throwable) }
-        }
-
         override fun exampleGroupIgnored(group: ExampleGroupContext) {
             reporters.forEach { it.exampleGroupIgnored(group) }
         }
 
-        override fun exampleGroupFinished(group: ExampleGroupContext) {
-            reporters.forEach { it.exampleGroupSuccess(group) }
+        override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+            reporters.forEach { it.exampleGroupFinished(group, result) }
         }
     }
 

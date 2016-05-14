@@ -3,6 +3,7 @@ package io.polymorphicpanda.kspec.console.reporter
 import io.polymorphicpanda.kspec.context.Context
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.engine.execution.ExecutionResult
 import io.polymorphicpanda.kspec.launcher.reporter.BaseReporter
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -22,26 +23,18 @@ class ConsoleReporter: BaseReporter() {
 
     private val counter = AtomicInteger()
 
-    override fun exampleGroupSuccess(group: ExampleGroupContext) {
-        super.exampleGroupSuccess(group)
+    override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+        super.exampleGroupFinished(group, result)
         updateConsole {  }
     }
 
-    override fun exampleSuccess(example: ExampleContext) {
-        super.exampleSuccess(example)
+    override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+        super.exampleFinished(example, result)
         counter.andIncrement
-        updateConsole {  }
-    }
-
-    override fun exampleGroupFailure(group: ExampleGroupContext, reason: Throwable) {
-        super.exampleGroupFailure(group, reason)
-        updateConsole {  }
-    }
-
-    override fun exampleFailure(example: ExampleContext, reason: Throwable) {
-        super.exampleFailure(example, reason)
         updateConsole {
-            errorLogger.error(prettify(example, countParent(example)), reason)
+            if (result is ExecutionResult.Failure) {
+                errorLogger.error(prettify(example, countParent(example)), result.cause)
+            }
         }
     }
 

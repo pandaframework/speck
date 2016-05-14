@@ -13,17 +13,13 @@ open class ExecutionListenerAdapter: ExecutionListener {
 
     override fun exampleStarted(example: ExampleContext) { }
 
-    override fun exampleFailure(example: ExampleContext, throwable: Throwable) { }
-
     override fun exampleIgnored(example: ExampleContext) { }
 
-    override fun exampleFinished(example: ExampleContext) { }
+    override fun exampleFinished(example: ExampleContext, result: ExecutionResult) { }
 
     override fun exampleGroupStarted(group: ExampleGroupContext) { }
 
-    override fun exampleGroupFailure(group: ExampleGroupContext, throwable: Throwable) { }
-
     override fun exampleGroupIgnored(group: ExampleGroupContext) { }
 
-    override fun exampleGroupFinished(group: ExampleGroupContext) { }
+    override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) { }
 }

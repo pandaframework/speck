@@ -11,12 +11,10 @@ interface ExecutionListener {
     fun executionFinished()
 
     fun exampleStarted(example: ExampleContext)
-    fun exampleFailure(example: ExampleContext, throwable: Throwable)
     fun exampleIgnored(example: ExampleContext)
-    fun exampleFinished(example: ExampleContext)
+    fun exampleFinished(example: ExampleContext, result: ExecutionResult)
 
     fun exampleGroupStarted(group: ExampleGroupContext)
-    fun exampleGroupFailure(group: ExampleGroupContext, throwable: Throwable)
     fun exampleGroupIgnored(group: ExampleGroupContext)
-    fun exampleGroupFinished(group: ExampleGroupContext)
+    fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult)
 }

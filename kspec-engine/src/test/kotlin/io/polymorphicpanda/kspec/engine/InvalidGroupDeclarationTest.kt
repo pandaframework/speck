@@ -7,6 +7,7 @@ import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.engine.discovery.DiscoveryRequest
 import io.polymorphicpanda.kspec.engine.execution.ExecutionListenerAdapter
 import io.polymorphicpanda.kspec.engine.execution.ExecutionNotifier
+import io.polymorphicpanda.kspec.engine.execution.ExecutionResult
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -21,8 +22,10 @@ class InvalidGroupDeclarationTest {
         val expected = AtomicReference<Throwable>()
 
         notifier.addListener(object: ExecutionListenerAdapter() {
-            override fun exampleFailure(example: ExampleContext, throwable: Throwable) {
-                expected.set(throwable)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                if (result is ExecutionResult.Failure) {
+                    expected.set(result.cause)
+                }
             }
         })
 

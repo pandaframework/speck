@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.polymorphicpanda.kspec.context.ExampleContext
 import io.polymorphicpanda.kspec.context.ExampleGroupContext
+import io.polymorphicpanda.kspec.engine.execution.ExecutionResult
 import io.polymorphicpanda.kspec.launcher.reporter.BaseReporter
 import org.junit.Test
 import java.nio.file.Paths
@@ -19,13 +20,13 @@ class KSpecLauncherTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 
-            override fun exampleSuccess(example: ExampleContext) {
-                super.exampleSuccess(example)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                super.exampleFinished(example, result)
                 builder.appendln(example.description)
             }
         }
@@ -59,13 +60,13 @@ class KSpecLauncherTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 
-            override fun exampleSuccess(example: ExampleContext) {
-                super.exampleSuccess(example)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                super.exampleFinished(example, result)
                 builder.appendln(example.description)
             }
         }
@@ -101,13 +102,13 @@ class KSpecLauncherTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 
-            override fun exampleSuccess(example: ExampleContext) {
-                super.exampleSuccess(example)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                super.exampleFinished(example, result)
                 builder.appendln(example.description)
             }
         }
@@ -143,14 +144,16 @@ class KSpecLauncherTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 
-            override fun exampleFailure(example: ExampleContext, reason: Throwable) {
-                super.exampleFailure(example, reason)
-                builder.appendln(example.description)
+            override fun exampleFinished(example: ExampleContext, result: ExecutionResult) {
+                super.exampleFinished(example, result)
+                if (result is ExecutionResult.Failure) {
+                    builder.appendln(example.description)
+                }
             }
         }
 
@@ -182,8 +185,8 @@ class KSpecLauncherTest {
         val builder = StringBuilder()
 
         val reporter: BaseReporter = object: BaseReporter() {
-            override fun exampleGroupSuccess(group: ExampleGroupContext) {
-                super.exampleGroupSuccess(group)
+            override fun exampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+                super.exampleGroupFinished(group, result)
                 builder.appendln(group.description)
             }
 

@@ -26,24 +26,16 @@ class ExecutionNotifier {
         listeners.forEach { it.exampleGroupStarted(group) }
     }
 
-     fun notifyExampleGroupFailure(group: ExampleGroupContext, e: Throwable) {
-        listeners.forEach { it.exampleGroupFailure(group, e) }
-    }
-
-     fun notifyExampleGroupFinished(group: ExampleGroupContext) {
-        listeners.forEach { it.exampleGroupFinished(group) }
+     fun notifyExampleGroupFinished(group: ExampleGroupContext, result: ExecutionResult) {
+        listeners.forEach { it.exampleGroupFinished(group, result) }
     }
 
      fun notifyExampleStarted(example: ExampleContext) {
         listeners.forEach { it.exampleStarted(example) }
     }
 
-     fun notifyExampleFailure(example: ExampleContext, e: Throwable) {
-        listeners.forEach { it.exampleFailure(example, e) }
-    }
-
-     fun notifyExampleFinished(example: ExampleContext) {
-        listeners.forEach { it.exampleFinished(example) }
+     fun notifyExampleFinished(example: ExampleContext, result: ExecutionResult) {
+        listeners.forEach { it.exampleFinished(example, result) }
     }
 
      fun notifyExecutionStarted() {
